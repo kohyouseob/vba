@@ -1,0 +1,57 @@
+Dim arrSap(1 To 2, 1 To 7) As Variant
+Dim message, thisFileName As String
+
+Public Sub open_sit_rtn()
+
+    Dim fileName, reportName As String
+
+    Application.DisplayAlerts = False
+    Application.EnableEvents = False
+        
+    dtToday = Format(Now - 1, "dd-mm-yyyy")
+    
+    thisFileName = "SAP_Script_SEP_Open_Sit_RTN.xlsm"
+    reportName = "eStore-CZ SIT Open RDO"
+    fileName = "eStore_CZ_Open_SIT_RTN_" & dtToday & ".xlsx"
+    
+    arrSap(1, 1) = "ZRLEJ58350"         ' t-code
+    arrSap(1, 2) = "ECOMM_CZ_SIT_R"     ' variant
+    arrSap(1, 3) = "ALV_Type1"               ' download file type
+    arrSap(1, 4) = "C:\eStore\14_sit_return_do\"    ' download filename
+    arrSap(1, 5) = "ZRLEJ58350.txt"
+    arrSap(1, 6) = fileName             ' daily report filename
+    arrSap(1, 7) = reportName
+    
+    arrSap(2, 1) = "ZRSDD6A120"         ' t-code
+    arrSap(2, 2) = "ECOMM_CZ_SIT_R"     ' variant
+    arrSap(2, 3) = "ALV_Type2"               ' download file type
+    arrSap(2, 4) = "C:\eStore\14_sit_return_do\"    ' download filename
+    arrSap(2, 5) = "ZRSDD6A120.txt"
+    
+    ' get open inbound data
+    Call sap_script(1)
+           
+    ' update data
+    Call refresh_sheet_query("RDO")
+    
+    ' get delivery mode data
+    Call sap_script(2)
+    
+    ' update data
+    Call refresh_sheet_query("SO")
+    
+    ' refresh pivot table
+    Call refresh_pivot_table("List")
+  
+    ' save file
+    Call Save_File
+    
+    ' send email
+    Call send_outlook_mail("OK")
+
+    ActiveWorkbook.Save
+    
+    Application.DisplayAlerts = True
+    Application.EnableEvents = True
+    
+End Sub
