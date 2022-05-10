@@ -75,20 +75,19 @@ Private Sub sap_script(i As Integer)
     On Error GoTo errorHandler
         
     ' download selelction
-    session.findById("wnd[0]/shellcont/shell/shellcont/shell").pressToolbarContextButton "&MB_EXPORT"
-    
-    If arrSap(i, 3) = "&XXL" Then
-           
-        session.findById("wnd[0]/shellcont/shell/shellcont/shell").selectContextMenuItem "&XXL"
-    
-    ElseIf arrSap(i, 3) = "&PC" Then
-    
+    If arrSap(i, 3) = "ALV_Type1" Then
+       
+        session.findById("wnd[0]/shellcont/shell/shellcont/shell").pressToolbarContextButton "&MB_EXPORT"
         session.findById("wnd[0]/shellcont/shell/shellcont/shell").selectContextMenuItem "&PC"
-        session.findById("wnd[1]/usr/subSUBSCREEN_STEPLOOP:SAPLSPO5:0150/sub:SAPLSPO5:0150/radSPOPLI-SELFLAG[1,0]").Select
-        session.findById("wnd[1]/usr/subSUBSCREEN_STEPLOOP:SAPLSPO5:0150/sub:SAPLSPO5:0150/radSPOPLI-SELFLAG[1,0]").SetFocus
+        
+    ElseIf arrSap(i, 3) = "ALV_Type2" Then
+    
+        session.findById("wnd[0]/tbar[1]/btn[45]").press
         
     End If
     
+    session.findById("wnd[1]/usr/subSUBSCREEN_STEPLOOP:SAPLSPO5:0150/sub:SAPLSPO5:0150/radSPOPLI-SELFLAG[1,0]").Select
+    session.findById("wnd[1]/usr/subSUBSCREEN_STEPLOOP:SAPLSPO5:0150/sub:SAPLSPO5:0150/radSPOPLI-SELFLAG[1,0]").SetFocus
     session.findById("wnd[1]/tbar[0]/btn[0]").press
         
     ' download input
@@ -107,10 +106,10 @@ errorHandler:
         message = session.findById("wnd[0]/sbar").Text
         
         If message = "No data has been selected" Then
-            Call send_outlook_mail_Click("NoData")
+            Call send_outlook_mail("NoData")
             Call entire_row_delete("RDO")
         Else
-            Call send_outlook_mail_Click("Error")
+            Call send_outlook_mail("Error")
         End If
         
         session.findById("wnd[0]").Close
