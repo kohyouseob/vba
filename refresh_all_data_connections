@@ -1,3 +1,35 @@
+Private Sub refresh_sheet_query(shtQuery As String)
+
+    ThisWorkbook.Worksheets(shtQuery).ListObjects(shtQuery).QueryTable.Refresh BackgroundQuery:=False
+    Application.Wait (Now + TimeValue("0:00:05"))
+    
+    If Err.Number <> 0 Then
+        message = session.findById("wnd[0]/sbar").Text
+        Call send_outlook_mail_Click("Error")
+    End If
+        
+    End  'macro program end
+
+End Sub
+
+
+
+Private Sub refresh_pivot_table(shtPivot As String)
+
+    ThisWorkbook.Worksheets(shtPivot).PivotTables(shtPivot).RefreshTable
+    Application.Wait (Now + TimeValue("0:00:05"))
+    
+    If Err.Number <> 0 Then
+        message = session.findById("wnd[0]/sbar").Text
+        Call send_outlook_mail_Click("Error")
+    End If
+        
+    End  'macro program end
+
+End Sub
+
+
+
 Private Sub Refresh_All_Data_Connections()
 
 '    intConnections = ActiveWorkbook.Connections.Count - 1
