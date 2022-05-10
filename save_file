@@ -1,0 +1,14 @@
+Private Sub Save_File()
+    
+    Sheets("LIST").Select
+    Sheets("LIST").Copy
+    
+    ActiveWorkbook.SaveAs fileName:= _
+        arrSap(1, 4) & arrSap(1, 6), _
+        FileFormat:=xlOpenXMLWorkbook, CreateBackup:=False
+
+    ActiveWorkbook.Close
+    
+    Windows(thisFileName).Activate
+
+End Sub
