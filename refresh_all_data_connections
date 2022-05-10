@@ -1,3 +1,5 @@
+'ActiveWorkbook.RefreshAll
+
 Private Sub refresh_sheet_query(shtQuery As String)
 
     ThisWorkbook.Worksheets(shtQuery).ListObjects(shtQuery).QueryTable.Refresh BackgroundQuery:=False
