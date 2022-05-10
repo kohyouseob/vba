@@ -1,0 +1,122 @@
+Private Sub sap_script(i As Integer)
+
+    Dim Appl As Object
+    Dim Connection As Object
+    Dim session As Object
+    Dim WshShell As Object
+    Dim SapGui As Object
+    
+    Dim LastCol, LastRow As Long
+    Dim arrayBilling As Variant
+       
+    'Change for your file directory
+    Shell "C:\Program Files (x86)\SAP\FrontEnd\SapGui\saplogon.exe", 4
+    Set WshShell = CreateObject("WScript.Shell")
+    
+    Do Until WshShell.AppActivate("SAP Logon ")
+        Application.Wait Now + TimeValue("0:00:01")
+    Loop
+    
+    Set SapGui = GetObject("SAPGUI")
+    Set Appl = SapGui.GetScriptingEngine
+    Set Connection = Appl.Openconnection("SEP", True)
+    Set session = Connection.Children(0)
+
+    Sheets("MailingList").Select
+    strID = Cells(19, 2).Value
+    strPassword = Cells(20, 2).Value
+    'strTcode = Cells(17, 2).Value
+
+    session.findById("wnd[0]").resizeWorkingPane 172, 46, 0
+    session.findById("wnd[0]/usr/txtRSYST-MANDT").Text = "100"
+    session.findById("wnd[0]/usr/txtRSYST-BNAME").Text = strID
+    session.findById("wnd[0]/usr/pwdRSYST-BCODE").Text = strPassword
+    session.findById("wnd[0]/usr/txtRSYST-LANGU").Text = "EN"
+    session.findById("wnd[0]").sendVKey 0
+    
+    On Error Resume Next
+    ' log In pop-up
+    session.findById("wnd[1]/tbar[0]/btn[0]").press
+    session.findById("wnd[1]").sendVKey 0
+    
+    On Error Resume Next
+    session.findById("wnd[1]").sendVKey 0
+      
+    ' t-code input
+    session.findById("wnd[0]/tbar[0]/okcd").Text = arrSap(i, 1)
+    session.findById("wnd[0]").sendVKey 0
+    
+    ' variant selection
+    session.findById("wnd[0]/tbar[1]/btn[17]").press
+
+    ' variant input
+    session.findById("wnd[1]/usr/txtV-LOW").Text = arrSap(i, 2)
+    session.findById("wnd[1]/tbar[0]/btn[8]").press
+    
+    If i = 2 Then
+    
+        '' data paste selection screen
+        ''delivery order copy to clipboard
+        Sheets("RDO").Select
+        Range("M2").Select
+        Range(Selection, Selection.End(xlDown)).Select
+        Selection.Copy
+        
+        '' append sales order
+        session.findById("wnd[0]/usr/btn%_SO_VBELN_%_APP_%-VALU_PUSH").press
+        session.findById("wnd[1]/tbar[0]/btn[24]").press
+        session.findById("wnd[1]/tbar[0]/btn[8]").press
+    
+    End If
+    
+    ' excute
+    session.findById("wnd[0]").sendVKey 8
+        
+    On Error GoTo errorHandler
+        
+    ' download selelction
+    session.findById("wnd[0]/shellcont/shell/shellcont/shell").pressToolbarContextButton "&MB_EXPORT"
+    
+    If arrSap(i, 3) = "&XXL" Then
+           
+        session.findById("wnd[0]/shellcont/shell/shellcont/shell").selectContextMenuItem "&XXL"
+    
+    ElseIf arrSap(i, 3) = "&PC" Then
+    
+        session.findById("wnd[0]/shellcont/shell/shellcont/shell").selectContextMenuItem "&PC"
+        session.findById("wnd[1]/usr/subSUBSCREEN_STEPLOOP:SAPLSPO5:0150/sub:SAPLSPO5:0150/radSPOPLI-SELFLAG[1,0]").Select
+        session.findById("wnd[1]/usr/subSUBSCREEN_STEPLOOP:SAPLSPO5:0150/sub:SAPLSPO5:0150/radSPOPLI-SELFLAG[1,0]").SetFocus
+        
+    End If
+    
+    session.findById("wnd[1]/tbar[0]/btn[0]").press
+        
+    ' download input
+    session.findById("wnd[1]/usr/ctxtDY_PATH").Text = arrSap(i, 4)
+    session.findById("wnd[1]/usr/ctxtDY_FILENAME").Text = arrSap(i, 5)
+    session.findById("wnd[1]/tbar[0]/btn[11]").press
+    
+    ' close sapgui
+    session.findById("wnd[0]").Close
+    session.findById("wnd[1]/usr/btnSPOP-OPTION1").press
+    
+errorHandler:
+    
+    If Err.Number <> 0 Then
+        errStatus = "Y"
+        message = session.findById("wnd[0]/sbar").Text
+        
+        If message = "No data has been selected" Then
+            Call send_outlook_mail_Click("NoData")
+            Call entire_row_delete("RDO")
+        Else
+            Call send_outlook_mail_Click("Error")
+        End If
+        
+        session.findById("wnd[0]").Close
+        session.findById("wnd[1]/usr/btnSPOP-OPTION1").press
+        
+        End  'macro program end
+    End If
+    
+End Sub
