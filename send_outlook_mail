@@ -1,4 +1,4 @@
-Private Sub send_outlook_mail_Click(status As String)
+Private Sub send_outlook_mail_Click(fileName As String)
     
     On Error GoTo ErrHandler
     
@@ -10,64 +10,48 @@ Private Sub send_outlook_mail_Click(status As String)
     Dim objEmail As Object
     Set objEmail = objOutlook.CreateItem(olMailItem)
 
-    Sheets("mailingList").Select
+    Sheets("MailingList").Select
     mailAddress = Range("D20").Value
-    
-    If Range("D21").Value = "No" Then
-        Exit Sub
-    End If
 
-    Worksheets("List").Select
-    Range("A5").Select
+    If fileName = "NoData" Then
     
-    LastRow = ActiveSheet.UsedRange.SpecialCells(xlCellTypeLastCell).Row
-    strDate = Cells(LastRow, 1).Value
-    intDiff = Cells(LastRow, 11).Value
-
-    If status = "password_error" Then
-    
-        With objEmail
-            .To = "youseob.koh@samsung.com"
-            .bcc = "cpgs@samsung.com"
-            .Subject = "eStore Stock Diff - password_error"
-            .Body = "eStore Stock Diff - password_error"
-            .Display        ' Display the message in Outlook.
-            .send
-        End With
-        
-    ElseIf errRefresh = "Y" Then
-    
-        With objEmail
-            .To = "youseob.koh@samsung.com"
-            .bcc = "cpgs@samsung.com"
-            .Subject = "eStore Stock Diff (" & strDate & ") - ERROR"
-            .Body = errMsg
-            .Display        ' Display the message in Outlook.
-            .send
-        End With
-        
-    Else
-        
-'        With objEmail
-'            .To = "youseob.koh@samsung.com"
-'            .bcc = "cpgs@samsung.com"
-'            .Subject = "eStore Stock Diff (" & strDate & ") - SUCCESS"
-'            .Body = "eStore Stock Diff (" & strDate & ") - SUCCESS"
-'            .Display        ' Display the message in Outlook.
-'            .send
-'        End With
-        
         With objEmail
             .To = mailAddress
             .bcc = "cpgs@samsung.com"
-            .Subject = "eStore Stock Diff (" & strDate & ") - " & intDiff
-            .Body = "eStore Stock Diff (" & strDate & ") - " & intDiff
+            .Subject = arrSap(1, 7) & " : Zero"
+            .Body = arrSap(1, 7) & " : Zero"
             .Display        ' Display the message in Outlook.
-            .Attachments.Add ("C:\eStore\1_Stock_comparison\" & fileName)
             .send
         End With
-        
+    
+    ElseIf fileName = "Error" Then
+    
+        With objEmail
+            .To = "youseob.koh@samsung.com"
+            .bcc = "cpgs@samsung.com"
+            .Subject = arrSap(1, 7) & " : ERROR"
+            .Body = message
+            .Display        ' Display the message in Outlook.
+            .send
+        End With
+    
+    Else
+    
+        Sheets("LIST").Select
+        intCount = Range("A2").Value
+    
+        With objEmail
+            .To = mailAddress
+            .bcc = "cpgs@samsung.com"
+            .Subject = arrSap(1, 7) & " : " & intCount
+            .Body = arrSap(1, 7) & " : " & intCount
+            .Display        ' Display the message in Outlook.
+            .Attachments.Add (arrSap(1, 4) & arrSap(1, 6))
+            .send
+        End With
+    
     End If
+    
     ' CLEAR.
     Set objEmail = Nothing:    Set objOutlook = Nothing
         
