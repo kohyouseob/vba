@@ -1,0 +1,9 @@
+Private Sub entire_row_delete(shtName As String)
+    
+    Sheets(shtName).Select
+    Range("A2").Select
+    If Range("A2").Value <> "" Then
+        Range(shtName).EntireRow.Delete
+    End If
+
+End Sub
