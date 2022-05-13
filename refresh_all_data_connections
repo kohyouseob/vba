@@ -7,7 +7,7 @@ Private Sub refresh_sheet_query(shtQuery As String)
     
     If Err.Number <> 0 Then
         message = session.findById("wnd[0]/sbar").Text
-        Call send_outlook_mail_Click("Error")
+        Call send_outlook_mail("Error")
         
         End  'macro program end
     End If
@@ -25,7 +25,7 @@ Private Sub refresh_pivot_table(shtPivot As String)
     
     If Err.Number <> 0 Then
         message = session.findById("wnd[0]/sbar").Text
-        Call send_outlook_mail_Click("Error")
+        Call send_outlook_mail("Error")
         
         End  'macro program end
     End If
