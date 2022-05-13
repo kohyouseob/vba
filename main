@@ -3,7 +3,7 @@ Dim message, thisFileName As String
 
 Public Sub open_sit_rtn()
 
-    Dim fileName, reportName As String
+    Dim fileName, reportName, dtToday As String
 
     Application.DisplayAlerts = False
     Application.EnableEvents = False
