@@ -1,0 +1,6 @@
+Private Sub change_file_name()
+
+    Name "C:\eStore\12_available_stock\ZLSDH61020_SK_DA.TXTX" As _
+    "C:\eStore\12_available_stock\ZLSDH61020_SK_DA.TXT"
+
+End Sub
