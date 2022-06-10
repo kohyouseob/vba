@@ -1,0 +1,78 @@
+https://www.datanumen.com/blogs/schedule-specific-outlook-rules-run-specific-time/
+
+''VBA를 ThisOutllokSession에 생성해야함
+
+Public Sub Application_Reminder(ByVal Item As Object)
+    Dim objRules As Outlook.Rules
+    Dim objRule As Outlook.Rule
+
+    Set objRules = Outlook.Application.Session.DefaultStore.GetRules
+
+    If TypeOf Item Is TaskItem Then
+       'Refer to the subject of the specific task item
+       If Item.Subject = "Rule: [Download] Shipment KPI RAW" Then
+          'The corresponding specific rule
+          Set objRule = objRules.Item("[Download] Shipment KPI RAW")
+          With objRule
+               .Enabled = True
+               .Execute ShowProgress:=True, Folder:=Session.GetDefaultFolder(olFolderInbox), IncludeSubfolders:=True
+          End With
+          'MsgBox ("Move Successfully!")
+       ElseIf Item.Subject = "Rule: [Download] CZ Catalog Data Extract Report" Then
+          Set objRule = objRules.Item("[Download] CZ Catalog Data Extract Report")
+          With objRule
+               .Enabled = True
+               .Execute ShowProgress:=True, Folder:=Session.GetDefaultFolder(olFolderInbox), IncludeSubfolders:=True
+          End With
+       ElseIf Item.Subject = "Rule: [Download] SK Catalog Data Extract Report" Then
+          Set objRule = objRules.Item("[Download] SK Catalog Data Extract Report")
+          With objRule
+               .Enabled = True
+               .Execute ShowProgress:=True, Folder:=Session.GetDefaultFolder(olFolderInbox), IncludeSubfolders:=True
+          End With
+          'MsgBox ("Forward Successfully!")
+         'You can add more as per your needs
+       End If
+       objRules.Save
+    End If
+End Sub
+
+Public Sub CZ_Catalog_Data_Extract_Report(MItem As Outlook.MailItem)
+
+Dim oAttachment As Outlook.Attachment
+Dim sSaveFolder As String
+
+sSaveFolder = "C:\eStore\12_available_stock\"
+
+For Each oAttachment In MItem.Attachments
+    oAttachment.SaveAsFile sSaveFolder & "CZ_Catalog_Data_Extract_Report.xlsx"
+Next
+
+End Sub
+
+Public Sub SK_Catalog_Data_Extract_Report(MItem As Outlook.MailItem)
+
+Dim oAttachment As Outlook.Attachment
+Dim sSaveFolder As String
+
+sSaveFolder = "C:\eStore\12_available_stock\"
+
+For Each oAttachment In MItem.Attachments
+    oAttachment.SaveAsFile sSaveFolder & "SK_Catalog_Data_Extract_Report.xlsx"
+Next
+
+End Sub
+
+Public Sub Samsung_Shipment_KPI_raw_data(MItem As Outlook.MailItem)
+
+Dim oAttachment As Outlook.Attachment
+Dim sSaveFolder As String
+
+sSaveFolder = "C:\eStore\15_kpi\"
+
+For Each oAttachment In MItem.Attachments
+    oAttachment.SaveAsFile sSaveFolder & "Samsung KPI raw data.xls"
+Next
+
+End Sub
+
